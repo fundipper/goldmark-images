@@ -40,4 +40,4 @@ func Example() {
 
 [Goldmark](https://github.com/yuin/goldmark)
 
-[mdigger](https://github.com/mdigger/goldmark-images).
+[mdigger](https://github.com/mdigger/goldmark-images)
