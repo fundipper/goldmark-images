@@ -29,27 +29,24 @@ func (r *Renderer) renderImage(w util.BufWriter, source []byte, node ast.Node, e
 
 	n := node.(*ast.Image)
 
-	if extender.ReplaceFunc != nil {
-		src, data := extender.ReplaceFunc(util.BytesToReadOnlyString(n.Destination))
-
-		n.Destination = util.StringToReadOnlyBytes(src)
-		for k, v := range data {
-			n.SetAttributeString(k, util.StringToReadOnlyBytes(v))
-		}
+	for k, v := range extender.Attribute {
+		n.SetAttributeString(k, util.StringToReadOnlyBytes(v))
 	}
+	n.SetAttributeString(extender.Target, n.Destination)
+	n.Destination = util.StringToReadOnlyBytes(extender.Source)
 
-	w.WriteString("<img src=\"")
+	w.WriteString(`<img src="`)
 	if r.Unsafe || !html.IsDangerousURL(n.Destination) {
 		w.Write(util.EscapeHTML(util.URLEscape(n.Destination, true)))
 	}
 	w.WriteString(`" alt="`)
 	w.Write(n.Text(source))
-	w.WriteByte('"')
+	w.WriteString(`"`)
 
 	if n.Title != nil {
 		w.WriteString(` title="`)
-		r.Writer.Write(w, n.Title)
-		w.WriteByte('"')
+		w.Write(n.Title)
+		w.WriteString(`"`)
 	}
 
 	if n.Attributes() != nil {
@@ -61,5 +58,6 @@ func (r *Renderer) renderImage(w util.BufWriter, source []byte, node ast.Node, e
 	} else {
 		w.WriteString(">")
 	}
+
 	return ast.WalkSkipChildren, nil
 }

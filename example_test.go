@@ -13,13 +13,12 @@ var source = []byte(`![alt](image.png "title")`)
 func Example() {
 	md := goldmark.New(
 		goldmark.WithExtensions(
-			images.NewExtender(func(src string) (string, map[string]string) {
-				return "loading.gif",
-					map[string]string{
-						"class":    "lazy",
-						"data-src": src,
-					}
-			}),
+			images.NewExtender(
+				"/loading.gif", // source
+				"data-src",     // target
+				map[string]string{
+					"class": "lazy", // arrtibute
+				}),
 		),
 	)
 	if err := md.Convert(source, os.Stdout); err != nil {
@@ -28,6 +27,6 @@ func Example() {
 
 	// Output:
 	// <p>
-	// <img src="loading.gif" alt="alt" title="title" class="lazy" data-src="image.png">
+	// <img src="/loading.gif" alt="alt" title="title" class="lazy" data-src="image.png">
 	// </p>
 }

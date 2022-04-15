@@ -8,26 +8,27 @@ import (
 
 var extender *Extender
 
-type ReplaceFunc = func(src string) (string, map[string]string)
-
 type Extender struct {
-	ReplaceFunc
+	Source    string
+	Target    string
+	Attribute map[string]string
 }
 
 // New return initialized image render with source url replacing support.
-func NewExtender(opt ReplaceFunc) goldmark.Extender {
+func NewExtender(source, target string, attribute map[string]string) goldmark.Extender {
+
 	extender = &Extender{
-		ReplaceFunc: opt,
+		Source:    source,
+		Target:    target,
+		Attribute: attribute,
 	}
 	return extender
 }
 
 func (e *Extender) Extend(m goldmark.Markdown) {
-	if e.ReplaceFunc != nil {
-		m.Renderer().AddOptions(
-			renderer.WithNodeRenderers(
-				util.Prioritized(NewRenderer(), 500),
-			),
-		)
-	}
+	m.Renderer().AddOptions(
+		renderer.WithNodeRenderers(
+			util.Prioritized(NewRenderer(), 500),
+		),
+	)
 }
