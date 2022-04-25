@@ -23,7 +23,7 @@ func (r *Renderer) RegisterFuncs(reg renderer.NodeRendererFuncRegisterer) {
 }
 
 func (r *Renderer) renderImage(w util.BufWriter, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
-	if entering {
+	if !entering {
 		return ast.WalkContinue, nil
 	}
 
@@ -35,29 +35,25 @@ func (r *Renderer) renderImage(w util.BufWriter, source []byte, node ast.Node, e
 	n.SetAttributeString(extender.Target, n.Destination)
 	n.Destination = util.StringToReadOnlyBytes(extender.Source)
 
-	w.WriteString(`<img src="`)
+	_, _ = w.WriteString("<img src=\"")
 	if r.Unsafe || !html.IsDangerousURL(n.Destination) {
-		w.Write(util.EscapeHTML(util.URLEscape(n.Destination, true)))
+		_, _ = w.Write(util.EscapeHTML(util.URLEscape(n.Destination, true)))
 	}
-	w.WriteString(`" alt="`)
-	w.Write(n.Text(source))
-	w.WriteString(`"`)
-
+	_, _ = w.WriteString(`" alt="`)
+	_, _ = w.Write(util.EscapeHTML(n.Text(source)))
+	_ = w.WriteByte('"')
 	if n.Title != nil {
-		w.WriteString(` title="`)
-		w.Write(n.Title)
-		w.WriteString(`"`)
+		_, _ = w.WriteString(` title="`)
+		_, _ = w.Write(n.Title)
+		_ = w.WriteByte('"')
 	}
-
 	if n.Attributes() != nil {
 		html.RenderAttributes(w, n, html.ImageAttributeFilter)
 	}
-
 	if r.XHTML {
-		w.WriteString(" />")
+		_, _ = w.WriteString(" />")
 	} else {
-		w.WriteString(">")
+		_, _ = w.WriteString(">")
 	}
-
 	return ast.WalkSkipChildren, nil
 }

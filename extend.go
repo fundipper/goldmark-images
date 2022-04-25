@@ -16,7 +16,6 @@ type Extender struct {
 
 // New return initialized image render with source url replacing support.
 func NewExtender(source, target string, attribute map[string]string) goldmark.Extender {
-
 	extender = &Extender{
 		Source:    source,
 		Target:    target,
